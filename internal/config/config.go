@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"time"
@@ -20,12 +21,15 @@ type HTTPServer struct {
 }
 
 func MustLoadConfig() *Config {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
 	// Получение пути к конфигурации из переменной окружения CONFIG_PATH
 	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {
-		configPath = "./config/local.yaml"
-		//log.Fatal("CONFIG_PATH environment is not set")
+		log.Fatal("Error loading .env file")
 	}
 
 	// Проверка существования файла указанному пути configPath
@@ -36,7 +40,7 @@ func MustLoadConfig() *Config {
 	var cfg Config
 
 	// Чтение файла конфигурации
-	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
+	if err = cleanenv.ReadConfig(configPath, &cfg); err != nil {
 		log.Fatalf("cannot read config: %s", err)
 	}
 
